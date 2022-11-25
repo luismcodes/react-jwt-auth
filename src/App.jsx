@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import AuthService from "./services/auth.service";
 
 import "./App.css";
+import EventBus from "./common/EventBus";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Home from "./components/Home";
@@ -11,6 +12,7 @@ import Profile from "./components/Profile";
 import BoardUser from "./components/BoardUser";
 import BoardModerator from "./components/BoardModerator";
 import BoardAdmin from "./components/BoardAdmin";
+
 
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -25,10 +27,21 @@ function App() {
       setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
       setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
     }
+
+    EventBus.on("logout", () => {
+      logOut();
+    });
+
+    return () => {
+      EventBus.remove("logout");
+    };
   }, []);
 
   const logOut = () => {
     AuthService.logout();
+    setShowModeratorBoard(false);
+    setShowAdminBoard(false);
+    setCurrentUser(undefined);
   };
 
   return (
